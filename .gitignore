@@ -205,3 +205,42 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ---- Node.js ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- Dart / Flutter ----
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+mobile/build/
+
+# ---- React / Vite ----
+web/dist/
+web/.vite/
+
+# ---- OSM large data files ----
+data/osm/*.pbf
+data/osm/*.osm
+data/osm/processed/
+
+# ---- OSRM preprocessed files ----
+data/osrm/
+
+# ---- Offline tiles (large binaries) ----
+data/offline_packages/*.mbtiles
+
+# ---- Docker volumes (local) ----
+.docker/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- IDE ----
+.idea/
+.vscode/

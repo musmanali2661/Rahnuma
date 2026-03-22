@@ -1,0 +1,13 @@
+{
+  "app": {
+    "port": 4000,
+    "logLevel": "info"
+  },
+  "cors": {
+    "origins": ["http://localhost:5173", "http://localhost:80"]
+  },
+  "rateLimit": {
+    "windowMs": 60000,
+    "max": 100
+  }
+}
