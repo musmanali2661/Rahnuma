@@ -244,3 +244,4 @@ Thumbs.db
 # ---- IDE ----
 .idea/
 .vscode/
+backend/coverage/
