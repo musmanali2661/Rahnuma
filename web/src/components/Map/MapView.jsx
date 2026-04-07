@@ -3,6 +3,7 @@ import maplibregl from 'maplibre-gl';
 import { mapStyle } from '../../assets/styles/mapStyles.js';
 import useMapStore from '../../store/mapStore.js';
 import useRouteStore from '../../store/routeStore.js';
+import { useVoiceGuidance } from '../../hooks/useVoiceGuidance.js';
 import SearchBar from '../Search/SearchBar.jsx';
 import RouteCard from '../Navigation/RouteCard.jsx';
 import Controls from './Controls.jsx';
@@ -15,7 +16,11 @@ export default function MapView() {
   const mapRef = useRef(null);
 
   const { setMap, userLocation, setUserLocation } = useMapStore();
-  const { route } = useRouteStore();
+  const { route, isNavigating, updateStepFromLocation, currentStepIndex, clearRoute } = useRouteStore();
+  const { announceStep, ANNOUNCE_DISTANCE_M } = useVoiceGuidance();
+
+  // Track the last announced step index to avoid re-announcing the same step
+  const lastAnnouncedStepRef = useRef(-1);
 
   // Initialise the map
   useEffect(() => {
@@ -79,6 +84,26 @@ export default function MapView() {
     }
   }, [route]);
 
+  // Voice guidance: announce the current step when it changes during navigation
+  useEffect(() => {
+    if (!isNavigating || !route) return;
+    if (currentStepIndex === lastAnnouncedStepRef.current) return;
+
+    const steps = route.legs?.[0]?.steps || [];
+    const step = steps[currentStepIndex];
+    if (step) {
+      lastAnnouncedStepRef.current = currentStepIndex;
+      announceStep(step, true);
+    }
+  }, [isNavigating, currentStepIndex, route, announceStep]);
+
+  // Reset last-announced ref when navigation stops
+  useEffect(() => {
+    if (!isNavigating) {
+      lastAnnouncedStepRef.current = -1;
+    }
+  }, [isNavigating]);
+
   const startLocationTracking = useCallback((map) => {
     if (!navigator.geolocation) return;
 
@@ -89,13 +114,16 @@ export default function MapView() {
         const { latitude: lat, longitude: lon } = pos.coords;
         setUserLocation({ lat, lon });
         marker.setLngLat([lon, lat]).addTo(map);
+
+        // Update current navigation step based on position
+        updateStepFromLocation(lat, lon);
       },
       (err) => console.warn('Geolocation error:', err),
       { enableHighAccuracy: true, maximumAge: 5000 }
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [setUserLocation]);
+  }, [setUserLocation, updateStepFromLocation]);
 
   return (
     <div className="relative w-full h-full">
@@ -113,7 +141,7 @@ export default function MapView() {
       {/* Route card */}
       {route && (
         <div className="absolute bottom-4 left-4 right-4 z-10 max-w-lg mx-auto">
-          <RouteCard route={route} />
+          <RouteCard route={route} onClear={clearRoute} />
         </div>
       )}
     </div>
