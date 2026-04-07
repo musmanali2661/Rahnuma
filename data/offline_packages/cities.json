@@ -1,0 +1,74 @@
+[
+  {
+    "id": "karachi",
+    "name": "Karachi",
+    "name_ur": "کراچی",
+    "bbox": [66.68, 24.74, 67.53, 25.20],
+    "center": [67.0099, 24.8607],
+    "zoom_min": 10,
+    "zoom_max": 16
+  },
+  {
+    "id": "lahore",
+    "name": "Lahore",
+    "name_ur": "لاہور",
+    "bbox": [74.10, 31.30, 74.55, 31.68],
+    "center": [74.3436, 31.5497],
+    "zoom_min": 10,
+    "zoom_max": 16
+  },
+  {
+    "id": "islamabad",
+    "name": "Islamabad",
+    "name_ur": "اسلام آباد",
+    "bbox": [72.82, 33.57, 73.27, 33.84],
+    "center": [73.0479, 33.7215],
+    "zoom_min": 11,
+    "zoom_max": 16
+  },
+  {
+    "id": "rawalpindi",
+    "name": "Rawalpindi",
+    "name_ur": "راولپنڈی",
+    "bbox": [72.85, 33.45, 73.15, 33.70],
+    "center": [73.0479, 33.5651],
+    "zoom_min": 11,
+    "zoom_max": 16
+  },
+  {
+    "id": "faisalabad",
+    "name": "Faisalabad",
+    "name_ur": "فیصل آباد",
+    "bbox": [72.85, 31.28, 73.22, 31.58],
+    "center": [73.0654, 31.4177],
+    "zoom_min": 11,
+    "zoom_max": 16
+  },
+  {
+    "id": "multan",
+    "name": "Multan",
+    "name_ur": "ملتان",
+    "bbox": [71.32, 30.06, 71.62, 30.30],
+    "center": [71.4753, 30.1575],
+    "zoom_min": 11,
+    "zoom_max": 16
+  },
+  {
+    "id": "peshawar",
+    "name": "Peshawar",
+    "name_ur": "پشاور",
+    "bbox": [71.39, 33.93, 71.69, 34.10],
+    "center": [71.5249, 34.0151],
+    "zoom_min": 11,
+    "zoom_max": 16
+  },
+  {
+    "id": "quetta",
+    "name": "Quetta",
+    "name_ur": "کوئٹہ",
+    "bbox": [66.84, 30.07, 67.10, 30.29],
+    "center": [66.9750, 30.1798],
+    "zoom_min": 11,
+    "zoom_max": 16
+  }
+]

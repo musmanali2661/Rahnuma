@@ -1,0 +1,10 @@
+{
+  "app": {
+    "port": 4000,
+    "logLevel": "warn"
+  },
+  "rateLimit": {
+    "windowMs": 60000,
+    "max": 200
+  }
+}

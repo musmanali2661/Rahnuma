@@ -1,0 +1,188 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL + PostGIS ─────────────────────────────────────────────────
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: rahnuma-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rahnuma}
+      POSTGRES_USER: ${POSTGRES_USER:-rahnuma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rahnuma_secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/database/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rahnuma}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: rahnuma-redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── OSRM Routing Engine ──────────────────────────────────────────────────
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    container_name: rahnuma-osrm
+    restart: unless-stopped
+    volumes:
+      - ./data/osrm:/data
+    command: >
+      osrm-routed --algorithm mld /data/pakistan-latest.osrm
+      --max-table-size 1000
+      --max-matching-size 5000
+    ports:
+      - "${OSRM_PORT:-5000}:5000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Nominatim Geocoding ──────────────────────────────────────────────────
+  nominatim:
+    image: mediagis/nominatim:4.4
+    container_name: rahnuma-nominatim
+    restart: unless-stopped
+    environment:
+      PBF_URL: https://download.geofabrik.de/asia/pakistan-latest.osm.pbf
+      REPLICATION_URL: https://download.geofabrik.de/asia/pakistan-updates/
+      IMPORT_WIKIPEDIA: "false"
+      NOMINATIM_PASSWORD: nominatim_pass
+    volumes:
+      - nominatim_data:/var/lib/postgresql/14/main
+    ports:
+      - "${NOMINATIM_PORT:-7070}:8080"
+    shm_size: 1gb
+
+  # ── Martin Vector Tile Server ────────────────────────────────────────────
+  martin:
+    image: ghcr.io/maplibre/martin:v0.14.3
+    container_name: rahnuma-martin
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-rahnuma}:${POSTGRES_PASSWORD:-rahnuma_secret}@postgres:5432/${POSTGRES_DB:-rahnuma}
+    volumes:
+      - ./data/styles:/styles:ro
+    ports:
+      - "${TILE_SERVER_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nominatim:
+        condition: service_started
+    command: --listen-addresses 0.0.0.0:3000
+
+  # ── Backend API ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rahnuma-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 4000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-rahnuma}
+      POSTGRES_USER: ${POSTGRES_USER:-rahnuma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rahnuma_secret}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      OSRM_HOST: http://osrm
+      OSRM_PORT: 5000
+      TILE_SERVER_URL: http://martin:3000
+      JWT_SECRET: ${JWT_SECRET:-change_me}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      ML_SERVICE_HOST: ml-service
+      ML_SERVICE_PORT: 8000
+    volumes:
+      - ./backend/src:/app/src:ro
+      - ./data/offline_packages:/app/offline_packages
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ── Python ML Service ────────────────────────────────────────────────────
+  ml-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.ml
+    container_name: rahnuma-ml
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-rahnuma}
+      POSTGRES_USER: ${POSTGRES_USER:-rahnuma}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rahnuma_secret}
+      ML_SERVICE_PORT: 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Web Application (Vite dev server) ────────────────────────────────────
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: rahnuma-web
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:4000
+      VITE_TILE_SERVER_URL: http://localhost:3000
+      VITE_WS_URL: ws://localhost:4000
+    volumes:
+      - ./web/src:/app/src:ro
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  # ── Nginx Reverse Proxy ──────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: rahnuma-nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - web
+      - martin
+
+volumes:
+  postgres_data:
+  redis_data:
+  nominatim_data:

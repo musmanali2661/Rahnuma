@@ -1,0 +1,78 @@
+{
+  "version": 8,
+  "name": "Rahnuma",
+  "metadata": {
+    "description": "Rahnuma custom map style for Pakistan — optimised for Urdu labels and Pakistani road colours"
+  },
+  "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+  "sources": {
+    "openmaptiles": {
+      "type": "vector",
+      "url": "mbtiles://rahnuma.mbtiles"
+    }
+  },
+  "layers": [
+    { "id": "background", "type": "background", "paint": { "background-color": "#F5F5F5" } },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "water",
+      "paint": { "fill-color": "#B3E5FC" }
+    },
+    {
+      "id": "road-motorway",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["==", ["get", "class"], "motorway"],
+      "paint": { "line-color": "#2E7D32", "line-width": 4 }
+    },
+    {
+      "id": "road-primary",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["==", ["get", "class"], "primary"],
+      "paint": { "line-color": "#FF9800", "line-width": 2.5 }
+    },
+    {
+      "id": "road-secondary",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["in", ["get", "class"], ["literal", ["secondary", "tertiary"]]],
+      "paint": { "line-color": "#757575", "line-width": 1.5 }
+    },
+    {
+      "id": "road-residential",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["==", ["get", "class"], "residential"],
+      "paint": { "line-color": "#E0E0E0", "line-width": 1 }
+    },
+    {
+      "id": "road-unpaved",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": ["in", ["get", "class"], ["literal", ["track", "path"]]],
+      "layout": { "line-dasharray": [3, 2] },
+      "paint": { "line-color": "#8D6E63", "line-width": 1 }
+    },
+    {
+      "id": "place-city",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "filter": ["==", ["get", "class"], "city"],
+      "layout": {
+        "text-field": ["coalesce", ["get", "name:ur"], ["get", "name"]],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 14
+      },
+      "paint": { "text-color": "#1A237E", "text-halo-color": "#FFFFFF", "text-halo-width": 2 }
+    }
+  ]
+}
