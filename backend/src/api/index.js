@@ -14,7 +14,12 @@ const routeRouter = require('./routes/route');
 const searchRouter = require('./routes/search');
 const eventsRouter = require('./routes/events');
 const offlineRouter = require('./routes/offline');
+const authRouter = require('./routes/auth');
+const poisRouter = require('./routes/pois');
+const reportsRouter = require('./routes/reports');
 const authMiddleware = require('./middleware/auth');
+const swaggerUi = require('swagger-ui-express');
+const openApiSpec = require('./openapi');
 const rateLimitMiddleware = require('./middleware/rateLimit');
 const validationErrorHandler = require('./middleware/validation');
 const { initWebSocket } = require('./websocket/liveTracking');
@@ -55,10 +60,16 @@ app.use('/api/', rateLimitMiddleware);
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
 // ── API routes ───────────────────────────────────────────────────────────────
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/route', routeRouter);
 app.use('/api/v1/search', searchRouter);
 app.use('/api/v1/events', authMiddleware.optional, eventsRouter);
 app.use('/api/v1/offline', offlineRouter);
+app.use('/api/v1/pois', poisRouter);
+app.use('/api/v1/reports', reportsRouter);
+
+// ── API documentation ────────────────────────────────────────────────────────
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 // ── Validation error handler ─────────────────────────────────────────────────
 app.use(validationErrorHandler);
@@ -89,6 +100,8 @@ async function start() {
   }
 }
 
-start();
+if (require.main === module) {
+  start();
+}
 
 module.exports = { app, server }; // for testing

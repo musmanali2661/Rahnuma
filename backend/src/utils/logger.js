@@ -24,6 +24,6 @@ const logger = winston.createLogger({
 });
 
 // Add HTTP level
-logger.addColors({ http: 'magenta' });
+winston.addColors({ http: 'magenta' });
 
 module.exports = logger;
