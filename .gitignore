@@ -218,6 +218,9 @@ yarn-error.log*
 .flutter-plugins-dependencies
 .packages
 mobile/build/
+# Allow Flutter source lib directory (the root lib/ pattern above is for Python)
+!mobile/lib/
+!mobile/lib/**
 
 # ---- React / Vite ----
 web/dist/
