@@ -1,0 +1,71 @@
+{
+  "@@locale": "ur",
+  "appName": "رہنما",
+
+  "searchHint": "جگہ تلاش کریں…",
+  "searchTitle": "تلاش",
+
+  "mapTitle": "نقشہ",
+
+  "navigationTitle": "راستہ",
+
+  "offlineTitle": "آف لائن نقشے",
+
+  "categoryPetrol": "پیٹرول",
+  "categoryMosque": "مسجد",
+  "categoryHospital": "ہسپتال",
+  "categoryRestaurant": "ریستوران",
+  "categoryATM": "اے ٹی ایم",
+  "categoryParking": "پارکنگ",
+
+  "startNavigation": "راستہ شروع کریں",
+  "stopNavigation": "راستہ بند کریں",
+  "rerouting": "نیا راستہ ڈھونڈا جا رہا ہے…",
+
+  "voiceGoStraight": "سیدھا چلیں",
+  "voiceTurnLeft": "بائیں مڑیں",
+  "voiceTurnRight": "دائیں مڑیں",
+  "voiceDestinationReached": "آپ اپنی منزل پر پہنچ گئے",
+  "voiceSpeedBreaker": "سامنے اسپیڈ بریکر ہے، رفتار کم کریں",
+  "voicePotholeAhead": "سامنے گڑھا ہے",
+
+  "eta": "پہنچنے کا وقت",
+  "distance": "فاصلہ",
+  "km": "کلومیٹر",
+  "m": "میٹر",
+  "min": "منٹ",
+  "hr": "گھنٹہ",
+
+  "downloadMap": "نقشہ ڈاؤن لوڈ کریں",
+  "deleteMap": "نقشہ حذف کریں",
+  "downloading": "ڈاؤن لوڈ ہو رہا ہے…",
+  "downloaded": "ڈاؤن لوڈ ہو گیا",
+  "offlinePackages": "دستیاب شہروں کے نقشے",
+
+  "reportHazard": "خطرہ رپورٹ کریں",
+  "reportAccident": "حادثہ",
+  "reportPolice": "پولیس",
+  "reportRoadClosed": "سڑک بند",
+  "reportFlood": "سیلاب",
+  "reportProtest": "احتجاج",
+
+  "pothole": "گڑھا",
+  "speedBump": "اسپیڈ بریکر",
+  "roughRoad": "خراب سڑک",
+
+  "myLocation": "میری جگہ",
+  "setAsDestination": "منزل مقرر کریں",
+
+  "noResultsFound": "کوئی نتیجہ نہیں ملا",
+  "recentSearches": "حالیہ تلاش",
+
+  "languageEnglish": "English",
+  "languageUrdu": "اردو",
+
+  "errorNetworkTitle": "کنکشن کی خرابی",
+  "errorNetworkMessage": "سرور سے نہیں جڑ سکے۔ انٹرنیٹ چیک کریں۔",
+  "retry": "دوبارہ کوشش کریں",
+
+  "locationPermissionRequired": "راستے کے لیے لوکیشن کی اجازت ضروری ہے۔",
+  "openSettings": "ترتیبات کھولیں"
+}
